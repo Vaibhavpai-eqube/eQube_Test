@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify, render_template
 from models import db, Book
 from datetime import datetime
-import os, re
+import  re
 
-app = Flask(__name__)
+app = Flask(__name__)   # this is the main Flask application object,  it creates flask application instance.
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Tatva2025%40@localhost:3306/flask_books'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
@@ -16,9 +16,33 @@ with app.app_context():
 def index():
     return render_template("index.html")
 
-@app.route("/home")
-def home():
-    return render_template("home.html")
+#@app.route("/home")
+#def home():
+#   return render_template("home.html")
+
+# form data submission example
+@app.route("/form")
+def form():
+    return render_template("form.html")
+
+# form data display example
+@app.route("/formdata", methods=["POST", "GET"])
+def formdata():
+    if request.method == "POST":
+        result = request.form
+        name = result.get('name')
+        email = result.get('email')
+        return render_template("formdata.html", name=name, email=email)
+    else:
+        return render_template("formdata.html", name=None, email=None)
+
+# eg for dynamic url routing
+@app.route('/user/<username>')
+def show_user_profile(username):
+    if username == 'admin':
+        return "Welcome %s" %username
+    else:
+        return "Welcome %s" %username
 
 def isValid(email):
     regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
@@ -90,4 +114,5 @@ def deleteRequest(id):
     }), 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=1)    # Set debug=1 for development, here it automatically reloads the server on code changes
+    # app.run(debug=0)  # Set debug=0 for production, you have to run everytime after making changes
